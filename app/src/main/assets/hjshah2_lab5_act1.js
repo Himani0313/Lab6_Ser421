@@ -1,388 +1,400 @@
-var thirdcity = ['New York,US','New Delhi,IN','Sydney,AU','Shanghai,CN','Frankfurt,DE']
-var cityExistsFlag=0;
-var refreshFlag = 1;
-var table = document.getElementById("weathertable");
+'use strict';
 
-function getFromLocalStorage(city) {
-    return localStorage.getItem(city);
-}
+// helpers
+let p = (data)=>{
+    console.log(data);
+};
 
-function checkIfInLocalStorage(city) {
-    if(localStorage.getItem(city)){
-        return 1;
+let get_date = (dt)=>{
+    return new Date(parseInt(dt)*1000).toJSON().slice(0,19).replace(/-/g,'/').replace('T', " ");
+};
+
+// this utility method is taken from stack overflow
+// https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case
+String.prototype.toCamelCase = function(str) {
+    if(str !== null && str !== undefined)
+        return str
+            .replace(/\s(.)/g, function($1) { return $1.toUpperCase(); })
+            .replace(/\s/g, '')
+            .replace(/^(.)/, function($1) { return $1.toLowerCase(); });
+    else return str;
+};
+
+function generateDifferencesRow(city_name){
+    let data = {};
+    let date_Diff = "";
+    if(original_cities.includes(city_name)){
+        data.main = {};
+        data.main.temp = (parseFloat(original_cities_html[city_name].childNodes[2].innerText) -
+            parseFloat(original_cities_previous_html[city_name].childNodes[2].innerText)).toFixed(2);
+        data.main.humidity = (parseFloat(original_cities_html[city_name].childNodes[3].innerText) -
+            parseFloat(original_cities_previous_html[city_name].childNodes[3].innerText)).toFixed(2);
+        data.wind = {};
+        data.wind.speed = (parseFloat(original_cities_html[city_name].childNodes[4].innerText) -
+            parseFloat(original_cities_previous_html[city_name].childNodes[4].innerText)).toFixed(2);
+        data.clouds = {};
+        data.clouds.all = (parseFloat(original_cities_html[city_name].childNodes[5].innerText) -
+            parseFloat(original_cities_previous_html[city_name].childNodes[5].innerText)).toFixed(2);
+        date_Diff = Math.floor((Math.abs(new Date(original_cities_html[city_name].childNodes[1].innerText) -
+            new Date(original_cities_previous_html[city_name].childNodes[1].innerText))/1000));
+    }else{
+        data.main = {};
+        data.main.temp = (parseFloat(third_city_html[third_city_name].childNodes[2].innerText) -
+            parseFloat(third_city_previous_html[third_city_name].childNodes[2].innerText)).toFixed(2);
+        data.main.humidity = (parseFloat(third_city_html[third_city_name].childNodes[3].innerText) -
+            parseFloat(third_city_previous_html[third_city_name].childNodes[3].innerText)).toFixed(2);
+        data.wind = {};
+        data.wind.speed = (parseFloat(third_city_html[third_city_name].childNodes[4].innerText) -
+            parseFloat(third_city_previous_html[third_city_name].childNodes[4].innerText)).toFixed(2);
+        data.clouds = {};
+        data.clouds.all = (parseFloat(third_city_html[third_city_name].childNodes[5].innerText) -
+            parseFloat(third_city_previous_html[third_city_name].childNodes[5].innerText)).toFixed(2);
+        date_Diff = Math.floor((Math.abs(new Date(third_city_html[third_city_name].childNodes[1].innerText) -
+            new Date(third_city_previous_html[third_city_name].childNodes[1].innerText))/1000));
     }
-    else{
-        return 0;
-    }
+    date_Diff = Math.floor(date_Diff/60) + " minutes";
+    city_name = document.createElement("td");
+    city_name.innerText = "";
+    return generate_html_from_json(city_name, data, date_Diff);
 }
 
-function storeInLocalStorage(city, value) {
-    localStorage.setItem(city,value);
+function generate_html_from_json(city_name, data_object, date){
+    let timestamp = document.createElement("td");
+    timestamp.innerText = date;
+    let temperature = document.createElement("td");
+    temperature.innerText = data_object.main.temp;
+    let humidity = document.createElement("td");
+    humidity.innerText = data_object.main.humidity + "%";
+    let wind = document.createElement("td");
+    wind.innerText = data_object.wind.speed;
+    let cloud = document.createElement("td");
+    cloud.innerText = data_object.clouds.all+"%";
+    let city_html = document.createElement("tr");
+    city_html.appendChild(city_name);
+    city_html.appendChild(timestamp);
+    city_html.appendChild(temperature);
+    city_html.appendChild(humidity);
+    city_html.appendChild(wind);
+    city_html.appendChild(cloud);
+    return city_html;
 }
 
-function parsedata(city, data) {
-    var temp = JSON.parse(data);
-    var arr = [];
-    arr.push(city);
-    var time = timeConverter(temp.dt);
-    arr.push(time)
-    arr.push(convertKelvinToCelsius(temp.main.temp));
-    arr.push(temp.main.humidity);
-    arr.push((temp.wind.speed * 2.23694).toFixed(3));
-    arr.push(temp.clouds.all);
-    return arr;
-}
+// fixed data
+let cities = {};
+localStorage.setItem('firstTime', 'true');
+cities['karachi'] = {id: 1174872, name: "Karachi"};
+cities['lahore'] =   {id: 1172451, name: "Lahore"};
+cities['islamabad'] = {id: 1176615, name: "Islamabad"};
+cities['peshawar'] = {id: 1168197, name: "Peshawar",};
+cities['quetta'] =   {id: 1167528, name: "Quetta"};
+cities['hyderabad'] =   {id: 1176734, name: "Hyderabad"};
+cities['tempe'] =   {id: 5317058, name: "Tempe"};
+let API_KEY = "02ac79da5464da32c20e18fc437d0e16";
+//let API_KEY = "f9cd3610e9144f965638b5be216a0b1d";
+//let API_KEY = "f9cd3610e9144f965638b5be216a0123";
+// let original_cities = ["karachi","lahore"];
+// let third_city_name = "";
+// let original_cities_html = {};
+// original_cities_html['karachi'] = document.createElement("tr");
+// original_cities_html['lahore'] = document.createElement("tr");
+// let original_cities_previous_html = {};
+// original_cities_previous_html['karachi'] = document.createElement("tr");
+// original_cities_previous_html['lahore'] = document.createElement("tr");
 
-function addtablerow(city, data,rowno) {
-    // var temp = JSON.parse(data)
-    var row = table.insertRow(rowno);
-    for(i = 0; i< 6; ++i){
-        row.cells[i] = row.insertCell(i)
-    }
-    row.cells[0].innerHTML = data[0];
-    // var time = timeConverter(temp.dt);
-    row.cells[1].innerHTML = data[1];
-    row.cells[2].innerHTML = data[2];
-    row.cells[3].innerHTML = data[3];
-    row.cells[4].innerHTML = data[4];
-    row.cells[5].innerHTML = data[5];
-}
+let original_cities = ["london","phoenix"];
+let third_city_list = ['peshawar','tempe','hyderabad','islamabad','quetta','karachi','mumbai','delhi','chennai','kolkata'];
+let third_city_name = "";
+let original_cities_html = {};
+original_cities_html['london'] = document.createElement("tr");
+original_cities_html['phoenix'] = document.createElement("tr");
+let original_cities_previous_html = {};
+original_cities_previous_html['london'] = document.createElement("tr");
+original_cities_previous_html['phoenix'] = document.createElement("tr");
 
-function convertKelvinToCelsius(kelvin) {
-    if (kelvin < (0)) {
-        return 'below absolute zero (0 K)';
-    } else {
-        return (kelvin-273.15).toFixed(2);
-    }
-}
+let third_city_html = {};
+third_city_html['peshawar'] = document.createElement("tr");
+third_city_html['tempe'] = document.createElement("tr");
+third_city_html['hyderabad'] = document.createElement("tr");
+third_city_html['islamabad'] = document.createElement("tr");
+third_city_html['quetta'] = document.createElement("tr");
+third_city_html['karachi'] = document.createElement("tr");
+third_city_html['mumbai'] = document.createElement("tr");
+third_city_html['delhi'] = document.createElement("tr");
+third_city_html['chennai'] = document.createElement("tr");
+third_city_html['kolkata'] = document.createElement("tr");
+let third_city_previous_html = {};
+third_city_previous_html['peshawar'] = document.createElement("tr");
+third_city_previous_html['tempe'] = document.createElement("tr");
+third_city_previous_html['hyderabad'] = document.createElement("tr");
+third_city_previous_html['islamabd'] = document.createElement("tr");
+third_city_previous_html['quetta'] = document.createElement("tr");
+third_city_previous_html['karachi'] = document.createElement("tr");
+third_city_previous_html['mumbai'] = document.createElement("tr");
+third_city_previous_html['delhi'] = document.createElement("tr");
+third_city_previous_html['chennai'] = document.createElement("tr");
+third_city_previous_html['kolkata'] = document.createElement("tr");
 
-function updateTableRow(city,rowno, d1,d2,d3,d4,d5) {
-    // var temp = JSON.parse(data);
-    console.log(rowno);
-    table.rows[rowno].cells[0].innerHTML = city;
-    // var time = timeConverter(temp.dt);
-    table.rows[rowno].cells[1].innerHTML = d1;
-    table.rows[rowno].cells[2].innerHTML = d2;
-    table.rows[rowno].cells[3].innerHTML = d3;
-    table.rows[rowno].cells[4].innerHTML = d4;
-    table.rows[rowno].cells[5].innerHTML = d5;
-}
+// frequent dom objects
+let city_data = document.getElementById("city_data");
+let third_city_option = document.getElementById("city");
+let nicest = document.getElementById("nicest");
+let worst = document.getElementById("worst");
+let avg_temp = document.getElementById("avg_temp");
+let avg_hum = document.getElementById("avg_hum");
+let error = document.getElementById("error");
+let mainTable = document.getElementById("mainTable");
 
-function timeConverter(UNIX_timestamp){
-    var a = new Date(UNIX_timestamp * 1000);
-    var year = a.getFullYear();
-    var month = a.getMonth();
-    var date = a.getDate();
-    var hour = a.getHours();
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    var time = year + ':' + month + ':' + date + ':' + hour + ':' + min + ':' + sec ;
-    return time;
-}
 
-function populatemenu(elementId, menuArray) {
-    var sel = document.getElementById(elementId);
-    document.getElementById(elementId).selectedIndex = -1;
-    document.getElementById(elementId).innerHTML = "";
-    for(var i = 0; i < menuArray.length; i++) {
-        var opt = document.createElement('option');
-        opt.innerHTML = menuArray[i];
-        opt.value = menuArray[i];
-        sel.appendChild(opt);
-    }
-}
-
-function calculations() {
-    var cityValues = [];
-
-    if(refreshFlag == 0){
-        for(i=1;i<table.rows.length;i=i+2){
-            var city = [];
-            city.push(table.rows[i].cells[0].innerHTML);
-            city.push(table.rows[i].cells[2].innerHTML);
-            city.push(table.rows[i].cells[3].innerHTML);
-            city.push(table.rows[i].cells[4].innerHTML);
-            city.push(table.rows[i].cells[5].innerHTML);
-            cityValues.push(city);
-        }
-        console.log(cityValues);
-    }
-    else {
-        for(i=1;i<table.rows.length;++i){
-            var city = [];
-            city.push(table.rows[i].cells[0].innerHTML);
-            city.push(table.rows[i].cells[2].innerHTML);
-            city.push(table.rows[i].cells[3].innerHTML);
-            city.push(table.rows[i].cells[4].innerHTML);
-            city.push(table.rows[i].cells[5].innerHTML);
-            cityValues.push(city);
-        }
-        console.log(cityValues);
-    }
-    var avgTemp =0, avgHumidity =0,maxTemp =0, maxHumidity =0, indexTemp, indexHumidity, objectiveComponent = [], bestWeather = 0, worstWeather = 1000, bestWeatherIndex, worstWeatherIndex;
-    for(i=0;i<cityValues.length;++i){
-        avgTemp += parseFloat(cityValues[i][1]);
-        avgHumidity += parseFloat(cityValues[i][2]);
-        if(maxTemp<parseFloat(cityValues[i][1])){
-            maxTemp = parseFloat(cityValues[i][1]);
-            indexTemp = i;
-        }
-        if(maxHumidity<parseFloat(cityValues[i][2])){
-            maxHumidity = parseFloat(cityValues[i][2])
-            indexHumidity = i;
-        }
-        objectiveComponent.push((parseFloat(cityValues[i][1])*0.4) + (parseFloat(cityValues[i][2])*0.15) + (parseFloat(cityValues[i][3])*0.25) + (parseFloat(cityValues[i][4])*0.2))
-    }
-    for(i=0;i<objectiveComponent.length;++i){
-        if(bestWeather<parseFloat(objectiveComponent[i])){
-            bestWeather = parseFloat(objectiveComponent[i])
-            bestWeatherIndex = i;
-        }
-        if(worstWeather > parseFloat(objectiveComponent[i])){
-            worstWeather = parseFloat(objectiveComponent[i])
-            worstWeatherIndex = i;
-        }
-    }
-    avgTemp = avgTemp/cityValues.length;
-    avgHumidity = avgHumidity/cityValues.length;
-    var temp = "The average temperature is " + avgTemp.toFixed(2) +" and the hottest city is " + cityValues[indexTemp][0];
-    var humidity = "The average humidity is " + avgHumidity.toFixed(2) +" and the most humid city is " + cityValues[indexHumidity][0];
-    var best = "The city with the nicest weather is " + cityValues[bestWeatherIndex][0];
-    var worst = "The city with the worst weather is " + cityValues[worstWeatherIndex][0];
-    document.getElementById("average-temp").innerHTML = temp;
-    document.getElementById("average-humidity").innerHTML = humidity;
-    document.getElementById("best-weather").innerHTML = best;
-    document.getElementById("worst-weather").innerHTML = worst;
-}
-
-function loadWeatherForCity(city, success, error ) {
-    // Feature detection
-    if ( !window.XMLHttpRequest ) return;
-
-    // Create new request
-    var request = new XMLHttpRequest();
-
-    // Setup callbacks
-    request.onreadystatechange = function () {
-
-        // If the request is complete
-        if ( request.readyState === 4 ) {
-
-            // If the request failed
-            if ( request.status >= 400 && request.status< 500 ) {
-                if ( error && typeof error === 'function' ) {
-                    error( request.responseText, request );
-                    document.getElementById("error").innerHTML= "CLIENT ERROR: " + request.responseText;
+function show_data(isRefresh=false, isThirdCity=true){
+    clear_chart();
+    for(let city in original_cities){
+        if(original_cities.hasOwnProperty(city)){
+            city_data.appendChild(original_cities_html[original_cities[city]]);
+            if(isRefresh){
+                if(original_cities_previous_html[original_cities[city]].childElementCount > 0){
+                    if(original_cities_previous_html[original_cities[city]].childNodes[1].innerText !== original_cities_html[original_cities[city]].childNodes[1].innerText)
+                        city_data.appendChild(original_cities_previous_html[original_cities[city]]);
+                    //city_data.appendChild(generateDifferencesRow("karachi"));
                 }
-                return;
-            }
-            if ( request.status >= 500 && request.status< 600 ) {
-                if ( error && typeof error === 'function' ) {
-                    error( request.responseText, request );
-                    document.getElementById("error").innerHTML = "SERVER ERROR: " + request.responseText;
-                }
-                return;
-            }
-            // If the request succeeded
-            if ( success && typeof success === 'function' ) {
-                success( request.responseText, request );
             }
         }
-
-    };
-    request.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=f9cd3610e9144f965638b5be216a0b1d", true);
-    request.send();
+    }
+    if(third_city_name !== ""){
+        city_data.appendChild(third_city_html[third_city_name]);
+    }
+    if(isRefresh && third_city_name !== "" && !isThirdCity){
+        if(third_city_previous_html[third_city_name].childElementCount > 0) {
+            //city_data.appendChild(generateDifferencesRow(third_city_name));
+            if(third_city_html[third_city_name].childNodes[1].innerText !==
+                third_city_previous_html[third_city_name].childNodes[1].innerText){
+                city_data.appendChild(third_city_previous_html[third_city_name]);
+            }
+        }
+    }
+    update_info();
 }
 
-function onWebPageLoad(xml) {
+function clear_chart(){
+    city_data.innerHTML="";
+}
 
-    populatemenu('thirdcity-option',thirdcity);
-    if(checkIfInLocalStorage("Phoenix,US")){
-        var phoenixData = loadWeatherForCity("Phoenix,US",
-            function (data) {
-                // On success...
-                var tempValue = parsedata("Phoenix,US",data) ;
-                var oldValue = JSON.parse(getFromLocalStorage("Phoenix,US"));
-                addtablerow("Phoenix,US",tempValue,-1);
-                refreshFlag = 0;
-                if(tempValue[1]==oldValue[1]){
-                    oldValue = ["Phoenix,US",'','','','','']
-                    addtablerow("Phoenix,US",oldValue,-1);
-                }
-                else {
-                    addtablerow("Phoenix,US",oldValue,-1);
-                }
-                tempValue = JSON.stringify(tempValue);
-                storeInLocalStorage("Phoenix,US",tempValue);
-                calculations();
-            },
-            function (data) {
-                // On failure...
-            });
 
-    }
-    else{
-        var phoenixData = loadWeatherForCity("Phoenix,US",
-            function (data) {
-                // On success...
-                var tempValue = parsedata("Phoenix,US",data) ;
-                addtablerow("Phoenix,US",tempValue,0);
-                tempValue = JSON.stringify(tempValue);
-                storeInLocalStorage("Phoenix,US",tempValue);
-                calculations();
-            },
-            function (data) {
-                // On failure...
-            });
-    }
-    if(checkIfInLocalStorage("London,GB")){
-        var phoenixData = loadWeatherForCity("London,GB",
-            function (data) {
-                var tempValue = parsedata("London,GB",data) ;
-                var oldValue = JSON.parse(getFromLocalStorage("London,GB"));
-                addtablerow("London,GB",tempValue,-1);
-                refreshFlag = 0;
-                if(tempValue[1]==oldValue[1]){
-                    oldValue = ["London,GB",'','','','','']
-                    addtablerow("London,GB",oldValue,-1);
-                }
-                else {
-                    addtablerow("London,GB",oldValue,-1);
-                }
-                tempValue = JSON.stringify(tempValue);
-                storeInLocalStorage("London,GB",tempValue);
-                calculations();
-            },
-            function (data) {
-                // On failure...
-            });
-    }
-
-    else{
-        var londonData = loadWeatherForCity("London,GB",
-            function (data) {
-                // On success...
-                var tempValue = parsedata("London,GB",data);
-                addtablerow("London,GB",tempValue,-1);
-                tempValue = JSON.stringify(tempValue);
-                storeInLocalStorage("London,GB",tempValue);
-                calculations();
-            },
-            function (data) {
-                // On failure...
-            });
+function handle_response(data, fromAPI=false, isThirdCity=false){
+    p(data);
+    mainTable.removeAttribute("hidden");
+    let data_object = JSON.parse(data);
+    if(data_object!==null){
+        let date = get_date(data_object.dt);
+        let city = data_object.name;
+        let city_name = document.createElement("td");
+        city_name.innerText = city + ", " + data_object.sys.country;
+        //data_object.main.temp = (data_object.main.temp - 273.15).toFixed(2);
+        data_object.main.temp = ((data_object.main.temp - 32)*5/9).toFixed(2);
+        //data_object.wind.all = (data_object.wind.all * 2.23694).toFixed(2);
+        data_object.wind.all = (data_object.wind.all * 1).toFixed(2);
+        let tr = generate_html_from_json(city_name, data_object, date);
+        if(original_cities.includes(city.toLowerCase())){
+            if(fromAPI){
+                original_cities_previous_html[city.toLowerCase()] = original_cities_html[city.toLowerCase()];
+            }
+            original_cities_html[city.toLowerCase()] = tr;
+        }else{
+            if(fromAPI){
+                third_city_previous_html[third_city_name] = third_city_html[third_city_name];
+            }
+            third_city_html[third_city_name] = tr;
+        }
+        show_data(fromAPI, isThirdCity);
     }
 }
 
-function updateWeatherOfThirdCity(element) {
-    var text = element.options[element.selectedIndex].text;
-    var oldValue = [], newValue;
-    var temp = loadWeatherForCity(text,
-        function (data) {
-            newValue = parsedata(text,data);
-            if(refreshFlag == 0){
-                if(cityExistsFlag){
+function errorHandle(req, city, isThirdCity){
+    p(req.status + "\n" + req.responseText);
+    if(req.status > 399){
+        error.innerHTML = "Server has thrown error " + req.status + ": " + JSON.parse(req.response).message;
+        error.innerHTML += "<br>Showing data from previous load if available.";
+        handle_response(localStorage.getItem(city), false, isThirdCity);
+    }
 
-                    var city = table.rows[table.rows.length-2].cells[0].innerHTML;
-                    if(table.rows.length == 6){
-                        updateTableRow(text,table.rows.length-1,newValue[1],newValue[2],newValue[3],newValue[4],newValue[5]);
+}
+
+// functionality
+function update_chart(city, isRefresh=false, isThirdCity=false){
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = () => {
+        if(req.readyState === 1){
+            setTimeout(function () {
+                if(req.readyState === 4 && req.status === 0 || req.readyState === 1){
+                    error.innerHTML = "I think you do not have internet connection. Previously stored data, if present, is currently being shown until new data is made available. Press refresh when you have internet connection.";
+                    if(localStorage.getItem(original_cities[0]) === null){
+                            mainTable.setAttribute("hidden","true");
                     }else{
-                        updateTableRow(text,table.rows.length-2,newValue[1],newValue[2],newValue[3],newValue[4],newValue[5]);
-                        updateTableRow(text,table.rows.length-1,'','','','','');
+                        p("Looks like I am always being called");
                     }
-                    calculations()
+                }else{
+                    p(req.readyState);
                 }
-                else {
-                    addtablerow(text,newValue,-1);
-                    // oldValue = [text,'','','','','']
-                    // addtablerow(text,oldValue,-1);
-                    cityExistsFlag = 1;
-                    calculations()
-                }
-            }
-            else{
-                if(cityExistsFlag){
-                    updateTableRow(text,table.rows.length-1,newValue[1],newValue[2],newValue[3],newValue[4],newValue[5]);
-                    calculations()
-                }
-                else {
+            }, 2000);
 
-                    addtablerow(text,newValue,-1);
-                    cityExistsFlag = 1;
-                    calculations()
-                }
-            }
-        },
-        function (data) {
+        }
+        if (req.readyState === 4 && req.status === 200) {
+            let data = req.response;
+            p("API RESPONSE: " + data);
+            localStorage.setItem(city, data);
+            error.innerHTML = "";
+            handle_response(data, true, isThirdCity);
+        }else if (req.readyState > 2){
+            errorHandle(req, city, isThirdCity);
+        }
+    };
+    if(isRefresh || localStorage.getItem(city) === null || localStorage.getItem(city+"_timestamp") === null){
+        p("Hitting API.");
+        if(cities[city] !== undefined){
+            req.open("GET", "http://api.openweathermap.org/data/2.5/weather?id=" + cities[city].id + "&APPID="+API_KEY+"&units=imperial", true);
+        }else{
+            req.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID="+API_KEY+"&units=imperial", true);
+        }
+        req.send();
+        if(localStorage.getItem('firstTime') === 'false' && localStorage.getItem(city) !== null){
+                error.innerHTML = "I think you do not have internet connection. Previously stored data, if present, is currently being shown until new data is made available. Press refresh when you have internet connection.";
+            handle_response(localStorage.getItem(city), false, isThirdCity);
+        }else
+            localStorage.setItem('firstTime', 'false');
+    }else{
+        handle_response(localStorage.getItem(city), false, isThirdCity);
+    }
+}
 
-        });
+function load(){
+    let url = window.location.href.split('?');
+    if(url.length > 1){
+        third_city_list = url[1].split(',');
+    }
+    handle_response(localStorage.getItem(original_cities[0]), false);
+    handle_response(localStorage.getItem(original_cities[1]), false);
+
+    // if(localStorage.getItem('lahore') !== null)
+    //     handle_response(localStorage.getItem('lahore'), false);
+    update_chart(original_cities[0], true);
+    update_chart(original_cities[1], true);
+    for(let city in third_city_list){
+        if(third_city_list.hasOwnProperty(city)){
+            let option = document.createElement("option");
+            option.setAttribute("value", third_city_list[city]);
+            option.innerText = third_city_list[city];
+            third_city_option.appendChild(option);
+        }
+    }
+    third_city();
+}
+
+function refresh_data(){
+    update_chart(original_cities[0], true);
+    update_chart(original_cities[1], true);
+    if(third_city_html.hasOwnProperty(third_city_name) && third_city_html[third_city_name].childElementCount > 2){
+        update_chart(third_city_option.value, true);
+    }
+
+}
+
+function third_city(){
+//    if(third_city_option.childElementCount > 5)
+//        third_city_option.removeChild(document.getElementById("dummy"));
+    third_city_name = third_city_option.value;
+    update_chart(third_city_name, true, true);
+    window.history.pushState('','','?'+third_city_name);
+}
+
+function distance_from_ideal(city){
+    let dist = [];
+    if(original_cities_html[city] !== undefined && original_cities_html[city] !== null){
+        if(original_cities_html[city].childElementCount > 0){
+            dist.push((parseFloat(original_cities_html[city].childNodes[2].innerText) - 25)/25);
+            dist.push((parseFloat(original_cities_html[city].childNodes[3].innerText) - 40)/40);
+            dist.push((parseFloat(original_cities_html[city].childNodes[4].innerText) - 5)/5);
+            dist.push((parseFloat(original_cities_html[city].childNodes[5].innerText) - 40)/40);
+        }
+    }else{
+        if(third_city_html[third_city_name].childElementCount > 0){
+            dist.push((parseFloat(third_city_html[third_city_name].childNodes[2].innerText) - 25)/25);
+            dist.push((parseFloat(third_city_html[third_city_name].childNodes[3].innerText) - 40)/40);
+            dist.push((parseFloat(third_city_html[third_city_name].childNodes[4].innerText) - 5)/5);
+            dist.push((parseFloat(third_city_html[third_city_name].childNodes[5].innerText) - 40)/40);
+        }
+    }
+    let sum = 0;
+    dist.forEach((x) => sum+=(x*x));
+    return Math.sqrt(sum);
+}
+
+function nicest_city(){
+    let all_cities_distance_from_ideal = {};
+    all_cities_distance_from_ideal[original_cities[0]] = distance_from_ideal(original_cities[0]);
+    all_cities_distance_from_ideal[original_cities[1]] = distance_from_ideal(original_cities[1]);
+    if(third_city_name !== "")
+        all_cities_distance_from_ideal['third'] = distance_from_ideal(third_city_name);
+    let minValue = 9999999;
+    let maxValue = -9999999;
+    let minCity = "";
+    let maxCity = "";
+    for(let city in all_cities_distance_from_ideal){
+        if(all_cities_distance_from_ideal.hasOwnProperty(city)){
+            if(all_cities_distance_from_ideal[city] < minValue){
+                minValue = all_cities_distance_from_ideal[city];
+                minCity = city;
+            }
+            if(all_cities_distance_from_ideal[city] > maxValue){
+                maxValue = all_cities_distance_from_ideal[city];
+                maxCity = city;
+            }
+        }
+    }
+    p(all_cities_distance_from_ideal);
+    if(minCity === "third") minCity = third_city_name;
+    if(maxCity === "third") maxCity = third_city_name;
+    nicest.innerText = "The nicest city is " + minCity;
+    worst.innerText = "The worst city is " + maxCity;
+}
+
+function getAverageHumidity(){
+    let sum = 0;
+    let count = 0;
+    city_data.childNodes.forEach((x)=>{
+        if(x.childElementCount > 3){
+            if(x.childNodes[0].innerText !== ""){
+                sum += parseFloat(x.childNodes[3].innerText);
+                count++;
+            }
+        }
+    });
+    return (sum/count).toFixed(2);
+}
+
+function getAverageTemperature(){
+    let sum = 0;
+    let count = 0;
+    city_data.childNodes.forEach((x)=>{
+        if(x.childElementCount > 2){
+            if(x.childNodes[0].innerText !== ""){
+                sum += parseFloat(x.childNodes[2].innerText);
+                count++;
+            }
+        }
+    });
+    return (sum/count).toFixed(2);
+}
+
+function avg_tem(){
+    avg_temp.innerText = "The average temperature is " + getAverageTemperature() + " Celcius.";
+}
+
+function avg_hm(){
+    avg_hum.innerText = "The average humidity is " + getAverageHumidity() + "%.";
 }
 
 
-function handleAsynchronousRequest(city,rowno) {
-    var temp = loadWeatherForCity(city,
-        function (data) {
-            // On success...
-            //console.log("i:",i);
-            var newValue = parsedata(city,data);
-            var oldValue = [];
-            if(checkIfInLocalStorage(city)) {
-                oldValue = JSON.parse(getFromLocalStorage(city));
-                if(newValue[1]==oldValue[1]){
-                    updateTableRow(city,rowno,'','','','','');
-                    calculations()
-                }
-                else{
-                    updateTableRow(city,rowno-1,newValue[1],newValue[2],newValue[3],newValue[4],newValue[5]);
-                    updateTableRow(city,rowno,oldValue[1],oldValue[2],oldValue[3],oldValue[4],oldValue[5]);
-                    calculations()
-                }
-                storeInLocalStorage(city,JSON.stringify(newValue));
-            }
-            else {
-                for (i = 0; i<6;++i){
-                    oldValue.push(table.rows[rowno-1].cells[i].innerHTML);
-                }
-                if(newValue[1]==oldValue[1]){
-                    updateTableRow(city,rowno,'','','','','');
-                    calculations();
-                }
-                else{
-                    updateTableRow(city,rowno-1,newValue[1],newValue[2],newValue[3],newValue[4],newValue[5]);
-                    updateTableRow(city,rowno,oldValue[1],oldValue[2],oldValue[3],oldValue[4],oldValue[5]);
-                    calculations();
-                }
-            }
-
-        },
-        function (data) {
-            // On failure...
-        });
-}
-
-function refreshButtonClicked() {
-    if(refreshFlag == 1){
-        refreshFlag = 0;
-
-        for(i = 2; i<=table.rows.length; i=i+2){
-            var row = table.insertRow(i);
-            for(j = 0; j< 6; ++j){
-                row.cells[j] = row.insertCell(j)
-            }
-            console.log(table.rows[i-1].cells[0].innerHTML);
-            //var city = table.rows[i-1].cells[0].innerHTML;
-
-        }
-        for(i = 2; i<=table.rows.length; i=i+2){
-            var city = table.rows[i-1].cells[0].innerHTML;
-            handleAsynchronousRequest(city,i);
-        }
-    }
-    else{
-        refreshFlag = 1;
-
-        for(i = 2; i<table.rows.length; ++i){
-            table.deleteRow(i);
-        }
-    }
+function update_info(){
+    avg_tem();
+    avg_hm();
+    nicest_city();
 }

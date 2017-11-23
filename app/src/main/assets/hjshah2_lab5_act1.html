@@ -2,40 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ser421 Lab 5</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-    </style>
+    <title>Weather report of Three Cities</title>
 </head>
-<body onload="onWebPageLoad()">
-    <p id="error"></p>
-    <table style="width:100%" id="weathertable">
+<body onload="load();">
+<p id="error"></p>
+<div id="mainTable">
+    <table border="1">
+        <thead>
         <tr>
-            <th>City Name</th>
-            <th>Timestamp (yyyy:mm:dd:hh:mm:ss)</th>
-            <th>Temprature in C</th>
-            <th>Humidity in %</th>
-            <th>Wind Speed in miles per hour</th>
-            <th>Cloudiness in %</th>
+            <td>
+                City Name
+            </td>
+            <td>
+                Timestamp
+            </td>
+            <td>
+                Temperature
+            </td>
+            <td>
+                Humidity
+            </td>
+            <td>
+                Wind Speed
+            </td>
+            <td>
+                Cloudiness
+            </td>
         </tr>
+        </thead>
+        <tbody id="city_data">
+
+        </tbody>
     </table>
-    <br>
-    <div id="thirdcity">
-        <label>Please select a third city: </label>
-        <select id = "thirdcity-option" onChange="updateWeatherOfThirdCity(this);"></select>
-    </div>
-    <br>
-    <input id="refresh-button" type="button" value="Refresh" onclick="refreshButtonClicked()">
-    <br>
-    <div id="outcomes-div">
-        <span id="average-temp"></span><br>
-        <span id="average-humidity"></span><br>
-        <span id="best-weather"></span><br>
-        <span id="worst-weather"></span>
-    </div>
-    <script src="hjshah2_lab5_act1.js"></script>
+    <select id="city" onchange="third_city();">
+        <!--<option id="dummy" value="" selected>Choose third city</option>
+        <option value="islamabad">Islamabad</option>
+        <option value="peshawar">Peshawar</option>
+        <option value="quetta">Quetta</option>
+        <option value="hyderabad">Hyderabad</option>
+        <option value="karachi">Karachi</option>-->
+    </select>
+    <input type="button" name="refresh" value="refresh" onclick="refresh_data();" />
+    <p id="avg_temp"></p>
+    <p id="avg_hum"></p>
+    <p id="nicest"></p>
+    <p id="worst"></p>
+</div>
 </body>
+<script src="hjshah2_lab5_act1.js"></script>
 </html>
