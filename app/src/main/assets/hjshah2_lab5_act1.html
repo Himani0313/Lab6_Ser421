@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ser421 Lab 5</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body onload="onWebPageLoad()">
+    <p id="error"></p>
+    <table style="width:100%" id="weathertable">
+        <tr>
+            <th>City Name</th>
+            <th>Timestamp (yyyy:mm:dd:hh:mm:ss)</th>
+            <th>Temprature in C</th>
+            <th>Humidity in %</th>
+            <th>Wind Speed in miles per hour</th>
+            <th>Cloudiness in %</th>
+        </tr>
+    </table>
+    <br>
+    <div id="thirdcity">
+        <label>Please select a third city: </label>
+        <select id = "thirdcity-option" onChange="updateWeatherOfThirdCity(this);"></select>
+    </div>
+    <br>
+    <input id="refresh-button" type="button" value="Refresh" onclick="refreshButtonClicked()">
+    <br>
+    <div id="outcomes-div">
+        <span id="average-temp"></span><br>
+        <span id="average-humidity"></span><br>
+        <span id="best-weather"></span><br>
+        <span id="worst-weather"></span>
+    </div>
+    <script src="hjshah2_lab5_act1.js"></script>
+</body>
+</html>
