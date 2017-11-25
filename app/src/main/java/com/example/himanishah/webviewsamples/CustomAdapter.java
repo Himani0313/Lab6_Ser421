@@ -7,12 +7,15 @@ package com.example.himanishah.webviewsamples;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -63,15 +66,23 @@ public class CustomAdapter extends ArrayAdapter{
             result=convertView;
         }
 
-        CheckBoxPOJO item = getItem(position);
-
+        final CheckBoxPOJO item = getItem(position);
 
         viewHolder.txtName.setText(item.name);
         viewHolder.checkBox.setChecked(item.checked);
-        viewHolder.checkBox.setClickable(!item.isFixed);
-        viewHolder.checkBox.setFocusable(!item.isFixed);
+        viewHolder.checkBox.setEnabled(!item.isFixed);
+        Button infoButton= (Button)  convertView.findViewById(R.id.buttonInfo);
 
+        infoButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // Your code that you want to execute on this button click
+                Toast.makeText(getContext(),item.getName() + "Selected",Toast.LENGTH_SHORT).show();
+            }
 
+        });
         return result;
     }
 }

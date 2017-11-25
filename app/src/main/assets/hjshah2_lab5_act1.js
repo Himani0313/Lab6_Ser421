@@ -82,13 +82,13 @@ function generate_html_from_json(city_name, data_object, date){
 // fixed data
 let cities = {};
 localStorage.setItem('firstTime', 'true');
-cities['karachi'] = {id: 1174872, name: "Karachi"};
-cities['lahore'] =   {id: 1172451, name: "Lahore"};
-cities['islamabad'] = {id: 1176615, name: "Islamabad"};
-cities['peshawar'] = {id: 1168197, name: "Peshawar",};
-cities['quetta'] =   {id: 1167528, name: "Quetta"};
-cities['hyderabad'] =   {id: 1176734, name: "Hyderabad"};
-cities['tempe'] =   {id: 5317058, name: "Tempe"};
+cities['Denver'] = {id: 5419384, name: "Denver"};
+cities['Miami'] =   {id: 4542692, name: "Miami"};
+cities['Chicago'] = {id: 4887398, name: "Chicago"};
+cities['Houston'] = {id: 2646507, name: "Houston",};
+cities['Philadelphia'] =   {id: 4440906, name: "Philadelphia"};
+cities['Dallas'] =   {id: 4462896, name: "Dallas"};
+cities['Tempe'] =   {id: 5317058, name: "Tempe"};
 let API_KEY = "02ac79da5464da32c20e18fc437d0e16";
 //let API_KEY = "f9cd3610e9144f965638b5be216a0b1d";
 //let API_KEY = "f9cd3610e9144f965638b5be216a0123";
@@ -101,38 +101,38 @@ let API_KEY = "02ac79da5464da32c20e18fc437d0e16";
 // original_cities_previous_html['karachi'] = document.createElement("tr");
 // original_cities_previous_html['lahore'] = document.createElement("tr");
 
-let original_cities = ["london","phoenix"];
-let third_city_list = ['peshawar','tempe','hyderabad','islamabad','quetta','karachi','mumbai','delhi','chennai','kolkata'];
+let original_cities = ["boston","phoenix"];
+let third_city_list = ['Denver','Miami','Chicago','Houston','Philadelphia','Dallas','Tempe','Seattle','Washington','Austin'];
 let third_city_name = "";
 let original_cities_html = {};
-original_cities_html['london'] = document.createElement("tr");
+original_cities_html['boston'] = document.createElement("tr");
 original_cities_html['phoenix'] = document.createElement("tr");
 let original_cities_previous_html = {};
-original_cities_previous_html['london'] = document.createElement("tr");
+original_cities_previous_html['boston'] = document.createElement("tr");
 original_cities_previous_html['phoenix'] = document.createElement("tr");
 
 let third_city_html = {};
-third_city_html['peshawar'] = document.createElement("tr");
-third_city_html['tempe'] = document.createElement("tr");
-third_city_html['hyderabad'] = document.createElement("tr");
-third_city_html['islamabad'] = document.createElement("tr");
-third_city_html['quetta'] = document.createElement("tr");
-third_city_html['karachi'] = document.createElement("tr");
-third_city_html['mumbai'] = document.createElement("tr");
-third_city_html['delhi'] = document.createElement("tr");
-third_city_html['chennai'] = document.createElement("tr");
-third_city_html['kolkata'] = document.createElement("tr");
+third_city_html['Denver'] = document.createElement("tr");
+third_city_html['Miami'] = document.createElement("tr");
+third_city_html['Chicago'] = document.createElement("tr");
+third_city_html['Houston'] = document.createElement("tr");
+third_city_html['Philadelphia'] = document.createElement("tr");
+third_city_html['Dallas'] = document.createElement("tr");
+third_city_html['Tempe'] = document.createElement("tr");
+third_city_html['Seattle'] = document.createElement("tr");
+third_city_html['Washington'] = document.createElement("tr");
+third_city_html['Austin'] = document.createElement("tr");
 let third_city_previous_html = {};
-third_city_previous_html['peshawar'] = document.createElement("tr");
-third_city_previous_html['tempe'] = document.createElement("tr");
-third_city_previous_html['hyderabad'] = document.createElement("tr");
-third_city_previous_html['islamabd'] = document.createElement("tr");
-third_city_previous_html['quetta'] = document.createElement("tr");
-third_city_previous_html['karachi'] = document.createElement("tr");
-third_city_previous_html['mumbai'] = document.createElement("tr");
-third_city_previous_html['delhi'] = document.createElement("tr");
-third_city_previous_html['chennai'] = document.createElement("tr");
-third_city_previous_html['kolkata'] = document.createElement("tr");
+third_city_previous_html['Denver'] = document.createElement("tr");
+third_city_previous_html['Miami'] = document.createElement("tr");
+third_city_previous_html['Chicago'] = document.createElement("tr");
+third_city_previous_html['Houston'] = document.createElement("tr");
+third_city_previous_html['Philadelphia'] = document.createElement("tr");
+third_city_previous_html['Dallas'] = document.createElement("tr");
+third_city_previous_html['Tempe'] = document.createElement("tr");
+third_city_previous_html['Seattle'] = document.createElement("tr");
+third_city_previous_html['Washington'] = document.createElement("tr");
+third_city_previous_html['Austin'] = document.createElement("tr");
 
 // frequent dom objects
 let city_data = document.getElementById("city_data");
@@ -163,7 +163,7 @@ function show_data(isRefresh=false, isThirdCity=true){
         city_data.appendChild(third_city_html[third_city_name]);
     }
     if(isRefresh && third_city_name !== "" && !isThirdCity){
-        if(third_city_previous_html[third_city_name].childElementCount > 0) {
+        if(third_city_previous_html[third_city_name.toLowerCase()].childElementCount > 0) {
             //city_data.appendChild(generateDifferencesRow(third_city_name));
             if(third_city_html[third_city_name].childNodes[1].innerText !==
                 third_city_previous_html[third_city_name].childNodes[1].innerText){
@@ -268,7 +268,15 @@ function update_chart(city, isRefresh=false, isThirdCity=false){
 function load(){
     let url = window.location.href.split('?');
     if(url.length > 1){
-        third_city_list = url[1].split(',');
+        third_city_list = url[1].split('&')[1].split(',');
+        third_city_name = url[1].split('&')[0].toLowerCase();
+        third_city_option.value = third_city_name;
+        if(third_city_name!==""){
+            let option = document.createElement("option");
+            option.setAttribute("value", third_city_name);
+            option.innerText = third_city_name;
+            third_city_option.appendChild(option);
+        }
     }
     handle_response(localStorage.getItem(original_cities[0]), false);
     handle_response(localStorage.getItem(original_cities[1]), false);
@@ -278,7 +286,7 @@ function load(){
     update_chart(original_cities[0], true);
     update_chart(original_cities[1], true);
     for(let city in third_city_list){
-        if(third_city_list.hasOwnProperty(city)){
+        if(third_city_list.hasOwnProperty(city) && third_city_list[city]!==third_city_name){
             let option = document.createElement("option");
             option.setAttribute("value", third_city_list[city]);
             option.innerText = third_city_list[city];
@@ -300,9 +308,10 @@ function refresh_data(){
 function third_city(){
 //    if(third_city_option.childElementCount > 5)
 //        third_city_option.removeChild(document.getElementById("dummy"));
+    p("LOOK AT ME!: "+third_city_option.value);
     third_city_name = third_city_option.value;
     update_chart(third_city_name, true, true);
-    window.history.pushState('','','?'+third_city_name);
+    window.history.pushState('','','?'+third_city_name+"&"+third_city_list);
 }
 
 function distance_from_ideal(city){

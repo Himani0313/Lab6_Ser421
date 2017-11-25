@@ -1,35 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LaunchActivity">
-
-    <ListView
-        android:id="@+id/listView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="match_parent"
+        >
 
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-         />
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="550dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="change"
-        android:id="@+id/changeButton"
-        android:layout_below="@+id/listView"
-        android:onClick="changeButtonClicked"
-        />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ShowWebView"
-        android:id="@+id/shoWebViewButton"
-        android:layout_below="@+id/changeButton"
-        android:onClick="showWebViewButtonClicked"
-     />
-</RelativeLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="change"
+            android:id="@+id/changeButton"
+            android:layout_below="@+id/listView"
+            android:onClick="changeButtonClicked"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ShowWebView"
+            android:id="@+id/shoWebViewButton"
+            android:layout_below="@+id/listView"
+            android:layout_toRightOf="@+id/changeButton"
+            android:onClick="showWebViewButtonClicked"
+            />
+    </RelativeLayout>
+</ScrollView>
+
