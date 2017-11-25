@@ -101,15 +101,15 @@ let API_KEY = "02ac79da5464da32c20e18fc437d0e16";
 // original_cities_previous_html['karachi'] = document.createElement("tr");
 // original_cities_previous_html['lahore'] = document.createElement("tr");
 
-let original_cities = ["tucson","phoenix"];
+let original_cities = ["Tucson","Phoenix"];
 let third_city_list = ['Denver','Miami','Chicago','Houston','Philadelphia','Dallas','Tempe','Seattle','Washington','Austin'];
 let third_city_name = "";
 let original_cities_html = {};
-original_cities_html['tucson'] = document.createElement("tr");
-original_cities_html['phoenix'] = document.createElement("tr");
+original_cities_html['Tucson'] = document.createElement("tr");
+original_cities_html['Phoenix'] = document.createElement("tr");
 let original_cities_previous_html = {};
-original_cities_previous_html['tucson'] = document.createElement("tr");
-original_cities_previous_html['phoenix'] = document.createElement("tr");
+original_cities_previous_html['Tucson'] = document.createElement("tr");
+original_cities_previous_html['Phoenix'] = document.createElement("tr");
 
 let third_city_html = {};
 third_city_html['Denver'] = document.createElement("tr");
@@ -163,7 +163,7 @@ function show_data(isRefresh=false, isThirdCity=true){
         city_data.appendChild(third_city_html[third_city_name]);
     }
     if(isRefresh && third_city_name !== "" && !isThirdCity){
-        if(third_city_previous_html[third_city_name.toLowerCase()].childElementCount > 0) {
+        if(third_city_previous_html[third_city_name].childElementCount > 0) {
             //city_data.appendChild(generateDifferencesRow(third_city_name));
             if(third_city_html[third_city_name].childNodes[1].innerText !==
                 third_city_previous_html[third_city_name].childNodes[1].innerText){
@@ -193,11 +193,11 @@ function handle_response(data, fromAPI=false, isThirdCity=false){
         //data_object.wind.all = (data_object.wind.all * 2.23694).toFixed(2);
         data_object.wind.all = (data_object.wind.all * 1).toFixed(2);
         let tr = generate_html_from_json(city_name, data_object, date);
-        if(original_cities.includes(city.toLowerCase())){
+        if(original_cities.includes(city)){
             if(fromAPI){
-                original_cities_previous_html[city.toLowerCase()] = original_cities_html[city.toLowerCase()];
+                original_cities_previous_html[city] = original_cities_html[city];
             }
-            original_cities_html[city.toLowerCase()] = tr;
+            original_cities_html[city] = tr;
         }else{
             if(fromAPI){
                 third_city_previous_html[third_city_name] = third_city_html[third_city_name];
@@ -269,7 +269,7 @@ function load(){
     let url = window.location.href.split('?');
     if(url.length > 1){
         third_city_list = url[1].split('&')[1].split(',');
-        third_city_name = url[1].split('&')[0].toLowerCase();
+        third_city_name = url[1].split('&')[0];
         third_city_option.value = third_city_name;
         if(third_city_name!==""){
             let option = document.createElement("option");

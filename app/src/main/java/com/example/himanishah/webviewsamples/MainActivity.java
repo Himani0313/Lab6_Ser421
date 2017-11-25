@@ -30,13 +30,13 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         browser.loadUrl(getString(R.string.wvURL)+"?"+s);
-        Log.d("ssxsx",getString(R.string.wvURL)+"?"+s);
+        Log.d("sending to browser",getString(R.string.wvURL)+"?"+s);
     }
 
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        Log.d("xsxs",browser.getUrl().split("[?]")[1]);
+        Log.d("on back button",browser.getUrl().split("[?]")[1]);
         Intent intent = new Intent(this,LaunchActivity.class);
         intent.putExtra("Third",browser.getUrl().split("[?]")[1]);
         startActivity(intent);

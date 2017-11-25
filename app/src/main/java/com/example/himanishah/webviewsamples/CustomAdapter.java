@@ -31,6 +31,7 @@ public class CustomAdapter extends ArrayAdapter{
     private static class ViewHolder {
         TextView txtName;
         CheckBox checkBox;
+        Button infoButton;
     }
 
     public CustomAdapter(ArrayList data, Context context) {
@@ -72,7 +73,7 @@ public class CustomAdapter extends ArrayAdapter{
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent, false);
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.txtName);
             viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
-
+            viewHolder.infoButton = (Button) convertView.findViewById(R.id.buttonInfo);
             result=convertView;
             convertView.setTag(viewHolder);
 
@@ -86,9 +87,15 @@ public class CustomAdapter extends ArrayAdapter{
         viewHolder.txtName.setText(item.name);
         viewHolder.checkBox.setChecked(item.checked);
         viewHolder.checkBox.setEnabled(!item.isFixed);
-        final Button infoButton= (Button)  convertView.findViewById(R.id.buttonInfo);
 
-        infoButton.setOnClickListener(new View.OnClickListener()
+        viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!item.isFixed()) item.checked = !item.checked;
+            }
+        });
+
+        viewHolder.infoButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
