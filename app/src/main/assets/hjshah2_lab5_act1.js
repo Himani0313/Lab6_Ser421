@@ -101,14 +101,14 @@ let API_KEY = "02ac79da5464da32c20e18fc437d0e16";
 // original_cities_previous_html['karachi'] = document.createElement("tr");
 // original_cities_previous_html['lahore'] = document.createElement("tr");
 
-let original_cities = ["boston","phoenix"];
+let original_cities = ["tucson","phoenix"];
 let third_city_list = ['Denver','Miami','Chicago','Houston','Philadelphia','Dallas','Tempe','Seattle','Washington','Austin'];
 let third_city_name = "";
 let original_cities_html = {};
-original_cities_html['boston'] = document.createElement("tr");
+original_cities_html['tucson'] = document.createElement("tr");
 original_cities_html['phoenix'] = document.createElement("tr");
 let original_cities_previous_html = {};
-original_cities_previous_html['boston'] = document.createElement("tr");
+original_cities_previous_html['tucson'] = document.createElement("tr");
 original_cities_previous_html['phoenix'] = document.createElement("tr");
 
 let third_city_html = {};

@@ -6,6 +6,7 @@ package com.example.himanishah.webviewsamples;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,10 +19,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class CustomAdapter extends ArrayAdapter{
     private ArrayList dataSet;
     Context mContext;
+    HashMap<String,String> hm;
 
     // View lookup cache
     private static class ViewHolder {
@@ -33,7 +37,18 @@ public class CustomAdapter extends ArrayAdapter{
         super(context, R.layout.row_item, data);
         this.dataSet = data;
         this.mContext = context;
-
+        hm=new HashMap<String, String>();
+        // 'Denver','Miami','Chicago','Houston','Philadelphia','Dallas','Tempe','Seattle','Washington','Austin'
+        hm.put("Denver","http://www.city-data.com/city/Denver-Colorado.html");
+        hm.put("Miami","http://www.city-data.com/city/Miami-Florida.html");
+        hm.put("Chicago","http://www.city-data.com/city/Chicago-Illinois.html");
+        hm.put("Houston","http://www.city-data.com/city/Houston-Texas.html");
+        hm.put("Philadelphia","http://www.city-data.com/city/Philadelphia-Pennsylvania.html");
+        hm.put("Dallas","http://www.city-data.com/city/Dallas-Texas.html");
+        hm.put("Tempe","http://www.city-data.com/city/Tempe-Arizona.html");
+        hm.put("Seattle","http://www.city-data.com/city/Seattle-Washington.html");
+        hm.put("Washington","http://www.city-data.com/city/Washington-District-of-Columbia.html");
+        hm.put("Austin","http://www.city-data.com/city/Austin-Texas.html");
     }
     @Override
     public int getCount() {
@@ -71,18 +86,21 @@ public class CustomAdapter extends ArrayAdapter{
         viewHolder.txtName.setText(item.name);
         viewHolder.checkBox.setChecked(item.checked);
         viewHolder.checkBox.setEnabled(!item.isFixed);
-        Button infoButton= (Button)  convertView.findViewById(R.id.buttonInfo);
+        final Button infoButton= (Button)  convertView.findViewById(R.id.buttonInfo);
 
         infoButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                // Your code that you want to execute on this button click
-                Toast.makeText(getContext(),item.getName() + "Selected",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(),hm.get(item.getName()) + " Selected",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(mContext,InfoActivity.class);
+                intent.putExtra("url",hm.get(item.getName()));
+                mContext.startActivity(intent);
             }
 
         });
         return result;
     }
+
 }
