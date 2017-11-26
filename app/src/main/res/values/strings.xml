@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">WebViewSamples</string>
+    <string name="app_name">Weather Table</string>
     <string name="wvURL">file:///android_asset/hjshah2_lab5_act1.html</string>
 </resources>

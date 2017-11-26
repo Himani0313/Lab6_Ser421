@@ -1,17 +1,11 @@
-package com.example.himanishah.webviewsamples;
+package com.example.himanishah.hjshah2_suhashmi_lab6;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,6 +19,7 @@ public class LaunchActivity extends AppCompatActivity {
     ArrayList<CheckBoxPOJO> output;
     ArrayList<String> choosenCityList;
     String chosenCity = "";
+    StringBuilder sb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +27,7 @@ public class LaunchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_launch);
 
         listView = (ListView) findViewById(R.id.listView);
+        sb = new StringBuilder();
         output = new ArrayList<>();
         dataModels = new ArrayList();
         ArrayList<String> cities = new ArrayList<>();
@@ -67,6 +63,9 @@ public class LaunchActivity extends AppCompatActivity {
             choosenCityList.add("Houston");
             choosenCityList.add("Philadelphia");
         }
+        for(int i = 0; i < 5; i++)
+            sb.append(choosenCityList.get(i)).append(",");
+
 
 
         for (String city : cities) {
@@ -87,69 +86,41 @@ public class LaunchActivity extends AppCompatActivity {
         adapter = new CustomAdapter(dataModels, getApplicationContext());
 
         listView.setAdapter(adapter);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView parent, View view, int position, long id) {
-//                CheckBoxPOJO dataModel= (CheckBoxPOJO) dataModels.get(position);
-//                if(!dataModel.isFixed()) dataModel.checked = !dataModel.checked;
-//                Log.d("On click", dataModel.getName() + " " + dataModel.isFixed + " " + dataModel.isChecked());
-//                adapter.notifyDataSetChanged();
-//            }
-//        });
-
+        Log.d("ONCREATE SB", sb.toString());
 
     }
 
     public void changeButtonClicked(View v) {
+        sb = new StringBuilder();
         ArrayList<CheckBoxPOJO> cityList = dataModels;
+        Log.d("CHOSING BEFORE CHANGE", chosenCity);
+
         for (int i = 0; i < cityList.size(); i++) {
-            CheckBoxPOJO city = cityList.get(i);
-            if (city.isChecked()) {
-                output.add(city);
-                Log.d("csacs", city.getName());
-            }
-        }
-
-    }
-
-    public void showWebViewButtonClicked(View v) {
-        StringBuilder sb = new StringBuilder();
-        ArrayList<CheckBoxPOJO> cityList = dataModels;
-        if (chosenCity.equals("")) {
-            chosenCity = cityList.get(0).getName();
-        }
-        for (int i = 0; i < cityList.size(); i++) {
-
             CheckBoxPOJO city = cityList.get(i);
             Log.d("chosing city", city.getName() + " " + city.isChecked() + " " + city.isFixed());
             if (city.isChecked()) {
+                if (chosenCity.equals("")) {
+                    chosenCity = city.getName();
+                    Log.d("CHOSING ON CHANGE", chosenCity);
+                }
                 Log.d("bbb", city.getName());
                 sb.append(city.getName()).append(",");
             }
         }
         Log.d("Cities", sb.toString());
+    }
 
-//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        // get the last know location from your location manager.
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        // now get the lat/lon from the location and do something with it.
-//        Log.d("Location", String.valueOf(location.getLatitude()) + " " + String.valueOf(location.getLongitude()) );
+    public void showWebViewButtonClicked(View v) {
+        
         if(sb.toString().split(",").length != 5){
             Toast.makeText(getApplicationContext(),"Select exactly 5 cities",Toast.LENGTH_LONG).show();
         }
         else{
             Intent intent = new Intent(this,MainActivity.class);
             //sb.append(output.indexOf())
+            if(chosenCity.equals("")){
+                chosenCity = sb.toString().split(",")[0];
+            }
             intent.putExtra("Output",chosenCity + "&" + sb.substring(0, sb.length()-1).toString());
 
             startActivity(intent);

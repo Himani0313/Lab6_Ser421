@@ -1,4 +1,4 @@
-package com.example.himanishah.webviewsamples;
+package com.example.himanishah.hjshah2_suhashmi_lab6;
 
 import org.junit.Test;
 

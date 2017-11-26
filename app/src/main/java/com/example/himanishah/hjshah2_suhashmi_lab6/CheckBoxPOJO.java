@@ -1,4 +1,4 @@
-package com.example.himanishah.webviewsamples;
+package com.example.himanishah.hjshah2_suhashmi_lab6;
 
 /**
  * Created by dhruvinpatel on 11/23/17.
