@@ -33,8 +33,9 @@
             android:text="ShowWebView"
             android:id="@+id/shoWebViewButton"
             android:layout_below="@+id/listView"
-            android:layout_toRightOf="@+id/changeButton"
             android:onClick="showWebViewButtonClicked"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             />
     </RelativeLayout>
 </ScrollView>

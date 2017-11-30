@@ -108,6 +108,7 @@ public class LaunchActivity extends AppCompatActivity {
             }
         }
         Log.d("Cities", sb.toString());
+        Toast.makeText(this, "Change Successful", Toast.LENGTH_SHORT).show();
     }
 
     public void showWebViewButtonClicked(View v) {
